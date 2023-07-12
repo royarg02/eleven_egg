@@ -1,5 +1,5 @@
 // The Android 11 easter egg, made in raw dart code.
-// Copyright (C) 2022 Anurag Roy
+// Copyright (C) 2022, 2023 Anurag Roy
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,6 +17,10 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
+// The view on which the easter egg will be drawn; initialized in the main
+// method.
+late final ui.FlutterView view;
 
 double cnvtDegToRad(double degrees){
   return (degrees / 180) * math.pi;
@@ -208,7 +212,7 @@ ui.Picture paint(ui.Rect paintBounds, double time) {
 }
 
 ui.Scene composite(ui.Picture picture) {
-  final double devicePixelRatio = ui.window.devicePixelRatio;
+  final double devicePixelRatio = view.devicePixelRatio;
 
   // This transforms the logical sizes to the physical size
   final Float64List deviceTransform = Float64List(16)
@@ -225,7 +229,7 @@ ui.Scene composite(ui.Picture picture) {
 }
 
 void beginFrame(Duration timeStamp) {
-  final ui.Size logicalSize = ui.window.physicalSize / ui.window.devicePixelRatio;
+  final ui.Size logicalSize = view.physicalSize / view.devicePixelRatio;
   final ui.Rect paintBounds = ui.Offset.zero & logicalSize;
   // Time scaler.
   //
@@ -234,11 +238,13 @@ void beginFrame(Duration timeStamp) {
   final double time = timeStamp.inMilliseconds / Duration.millisecondsPerSecond / timeScaler;
   final ui.Picture picture = paint(paintBounds, time);
   final ui.Scene scene = composite(picture);
-  ui.window.render(scene);
+  view.render(scene);
   ui.PlatformDispatcher.instance.scheduleFrame();
 }
 
 void main() {
+  view = ui.PlatformDispatcher.instance.implicitView!;
+
   ui.PlatformDispatcher.instance
     ..onBeginFrame = beginFrame
     ..scheduleFrame();
