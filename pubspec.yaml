@@ -4,7 +4,7 @@ description: The Android 11 easter egg, made in raw dart code.
 version: 1.0.0+2
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.2.0-0 <4.0.0'
 
 dependencies:
   sky_engine:
